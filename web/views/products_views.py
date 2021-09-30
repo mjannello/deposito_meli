@@ -1,11 +1,16 @@
+import logging
 import marshmallow
+
 from flask import request
 from flask_restplus import Resource
-from marshmallow import Schema, fields
 
 from web import schemas
 from web.api import api
 from web.views.serializers import add_product_fields, error_fields
+
+logger = logging.getLogger(__name__)
+logging.basicConfig()
+logging.getLogger().setLevel(logging.DEBUG)
 
 ns_products = api.namespace('products', description='Product Resource')
 
@@ -20,5 +25,7 @@ class ProductsCollection(Resource):
         try:
             product_data = self.add_product_schema.load(request.json)
         except marshmallow.ValidationError as e:
-            raise ValueError(e)
+            return ValueError(e)
+        logger.info(f'product_data: {product_data}')
+
         return 'first endpoint working', 200
