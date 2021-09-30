@@ -5,7 +5,7 @@ from web.api import api
 add_product_fields = api.model(
     'Add product fields',
     {
-        'id': fields.String(example="MLB12345"),
+        'product': fields.String(example="MLB12345"),
         'storage': fields.String(example="AR01"),
         'location': fields.String(example="LM-00-00-IZ"),
         'quantity': fields.Integer(example=10)
