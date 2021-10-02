@@ -1,10 +1,5 @@
 from web.db import db
 
-# storaged_products = db.Table('storaged_products',
-#                              db.Column('storage_id', db.Integer, db.ForeignKey('storages.id'), primary_key=True),
-#                              db.Column('product_id', db.Integer, db.ForeignKey('products.id'), primary_key=True),
-#                              db.Column('location_id', db.Integer, db.ForeignKey('locations.id'), primary_key=True)
-#                              )
 
 class ProductLocations(db.Model):
     __tablename__ = 'product_locations'
@@ -18,3 +13,7 @@ class ProductLocations(db.Model):
     product = db.relationship('Product', back_populates='product_locations')
     location = db.relationship('Location')
     storage = db.relationship('Storage', back_populates='product_locations')
+
+    def save(self):
+        db.session.add(self)
+        db.session.commit()

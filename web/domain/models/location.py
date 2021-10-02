@@ -1,4 +1,5 @@
 from web.db import db
+from web.domain.errors import InvalidArea
 
 
 class Location(db.Model):
@@ -9,3 +10,29 @@ class Location(db.Model):
     row = db.Column(db.Integer, nullable=False)
     side = db.Column(db.String(80), nullable=False)
 
+    location_initials = {
+        'AL': 'Almacen',
+        'LM': 'Limpieza',
+        'SG': 'Seguridad'
+    }
+
+    def __init__(self, area=None, hall=None, row=None, side=None):
+        self.area = area
+        self.hall = hall
+        self.row = row
+        self.side = side
+
+    @classmethod
+    def parse(cls, location_str):
+        area, hall, row, side = location_str.split('-')
+        if area not in Location.location_initials:
+            raise InvalidArea
+
+        # the other params were validated on schemas
+        area = Location.location_initials[area]
+        hall = int(hall)
+        row = int(row)
+        side = 'izquierda' if side == 'IZ' else 'derecha'
+
+        location = Location.query.filter_by(area=area, hall=hall, row=row, side=side).first()
+        return location
