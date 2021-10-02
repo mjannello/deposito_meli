@@ -6,7 +6,7 @@ from web.domain.models.location import Location
 from web.domain.models.product import Product
 from web.domain.models.relationships import StoredProducts
 from web.domain.models.storage import Storage
-from web.views.products_views import ns_products
+from web.views.products_views import ns_products, ns_locations
 
 app = Flask(__name__)
 # migrate = Migrate(app, db)
@@ -17,6 +17,7 @@ app.secret_key = 'secret string'
 db.init_app(app)
 api.init_app(app)
 api.add_namespace(ns_products)
+api.add_namespace(ns_locations)
 
 
 def db_seed():
@@ -92,12 +93,5 @@ if __name__ == '__main__':
         db.drop_all()
         db.create_all()
         db_seed()
-        p = Product(id=4, name='nombre 1', type='tipo4')
-        loc = Location(area='Limpieza', hall=4, row=2, side='derecha')
-        stg = Storage(id=2, name='BR02')
-
-        product_location = StoredProducts(product=p, location=loc, storage=stg, quantity=10)
-        db.session.add(product_location)
-        db.session.commit()
 
     app.run()

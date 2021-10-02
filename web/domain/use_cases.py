@@ -6,6 +6,7 @@ from web.domain.models.location import Location
 from web.domain.models.product import Product
 from web.domain.models.relationships import StoredProducts
 from web.domain.models.storage import Storage
+from web.domain.utils import validate_location_string
 from web.settings import MAX_TYPES_IN_LOCATION
 from web.settings import MAX_PRODUCTS_IN_LOCATION
 
@@ -16,11 +17,11 @@ logging.getLogger().setLevel(logging.DEBUG)
 
 def add_product(product_data):
     try:
-        input_quantity, location, product, storage = initialize_models(product_data)
+        input_quantity, location, product, storage = initialize_insertion_deletion_models(product_data)
     except ProductNotFound as e:
         raise e
 
-    types_of_products_stored, quantity_stored = get_type_of_products_and_quantity_stored(location, storage)
+    types_of_products_stored, quantity_stored = get_type_products_and_quantity_stored(location, storage)
 
     try:
         can_insert_product(types_of_products_stored, quantity_stored, product.type, input_quantity)
@@ -32,7 +33,7 @@ def add_product(product_data):
     return stored_product_id
 
 
-def initialize_models(product_data):
+def initialize_insertion_deletion_models(product_data):
     product_id = product_data.get('product')
     storage_name = product_data.get('storage')
     location_string = product_data.get('location')
@@ -45,7 +46,7 @@ def initialize_models(product_data):
     return quantity, location, product, storage
 
 
-def get_type_of_products_and_quantity_stored(location, storage):
+def get_type_products_and_quantity_stored(location, storage):
     stored_products_in_location = StoredProducts.get_all_products_in_location(location=location, storage=storage)
     types_of_products_stored = [sp.product.type for sp in stored_products_in_location]
     quantity_storaged = sum([sp.quantity for sp in stored_products_in_location])
@@ -62,7 +63,7 @@ def can_insert_product(types_of_products_stored, quantity_stored, input_product_
 
 def remove_product(product_data):
     try:
-        removal_quantity, location, product, storage = initialize_models(product_data)
+        removal_quantity, location, product, storage = initialize_insertion_deletion_models(product_data)
     except ProductNotFound as e:
         raise e
 
@@ -83,3 +84,17 @@ def can_remove_product(stored_product, removal_quantity):
         raise ProductIsNotInLocation
     if stored_product.quantity < removal_quantity:
         raise CanNotRemoveThatQuantity
+
+
+def get_products_in_location(storage_name, location_string):
+    try:
+        validate_location_string(location_string)
+    except ValueError as e:
+        raise e
+    location = Location.parse(location_string)
+    storage = Storage.get_storage(storage_name)
+
+    stored_product = StoredProducts.get_all_products_in_location(storage, location)
+    products = {sp.product.id: sp.quantity for sp in stored_product if sp.quantity > 0}
+    response = {'location': location_string, 'storage':storage_name, 'products': products}
+    return response
