@@ -16,12 +16,6 @@ class Location(db.Model):
         'SG': 'Seguridad'
     }
 
-    def __init__(self, area=None, hall=None, row=None, side=None):
-        self.area = area
-        self.hall = hall
-        self.row = row
-        self.side = side
-
     @classmethod
     def parse(cls, location_str):
         area, hall, row, side = location_str.split('-')

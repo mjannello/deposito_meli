@@ -2,7 +2,7 @@ class InvalidArea(Exception):
     pass
 
 
-class ProductDoesNotExist(Exception):
+class ProductNotFound(Exception):
     pass
 
 
@@ -11,4 +11,12 @@ class LocationIsFull(Exception):
 
 
 class CanNotAcceptAnotherProduct(Exception):
+    pass
+
+
+class ProductIsNotInLocation(Exception):
+    pass
+
+
+class CanNotRemoveThatQuantity(Exception):
     pass

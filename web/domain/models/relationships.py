@@ -16,19 +16,27 @@ class StoredProducts(db.Model):
 
     @classmethod
     def upsert(cls, product, location, storage, quantity):
-        stored_product = cls.query.filter_by(product=product, location=location, storage=storage).first()
+        stored_product = cls.get_product_in_location(product, location, storage)
         if not stored_product:
-            stored_product = cls(product, location, storage, quantity)
+            stored_product = cls(product=product, location=location, storage=storage, quantity=quantity)
         else:
             stored_product.quantity += quantity
         stored_product.save()
         return stored_product.product.id
 
-    def __init__(self, product, location, storage, quantity):
-        self.product = product
-        self.location = location
-        self.storage = storage
-        self.quantity = quantity
+    @classmethod
+    def get_all_products_in_location(cls, storage, location):
+        return cls.query.filter_by(location=location, storage=storage).all()
+
+    @classmethod
+    def get_product_in_location(cls, product, location, storage):
+        return cls.query.filter_by(product=product, location=location, storage=storage).first()
+
+    @classmethod
+    def remove(cls, stored_product, removal_quantity):
+        stored_product.quantity -= removal_quantity
+        stored_product.save()
+        return stored_product.product.id
 
     def save(self):
         db.session.add(self)
