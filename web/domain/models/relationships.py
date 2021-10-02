@@ -1,8 +1,8 @@
 from web.db import db
 
 
-class ProductLocations(db.Model):
-    __tablename__ = 'product_locations'
+class StoredProducts(db.Model):
+    __tablename__ = 'stored_products'
     id = db.Column(db.Integer, primary_key=True)
     product_id = db.Column(db.Integer, db.ForeignKey('products.id'), nullable=False)
     location_id = db.Column(db.Integer, db.ForeignKey('locations.id'), nullable=False)
@@ -10,9 +10,25 @@ class ProductLocations(db.Model):
     quantity = db.Column(db.Integer, nullable=False)
     __table_args__ = (db.UniqueConstraint(product_id, location_id, storaged_id), )
 
-    product = db.relationship('Product', back_populates='product_locations')
+    product = db.relationship('Product', back_populates='stored_products')
     location = db.relationship('Location')
-    storage = db.relationship('Storage', back_populates='product_locations')
+    storage = db.relationship('Storage', back_populates='stored_products')
+
+    @classmethod
+    def upsert(cls, product, location, storage, quantity):
+        stored_product = cls.query.filter_by(product=product, location=location, storage=storage).first()
+        if not stored_product:
+            stored_product = cls(product, location, storage, quantity)
+        else:
+            stored_product.quantity += quantity
+        stored_product.save()
+        return stored_product.product.id
+
+    def __init__(self, product, location, storage, quantity):
+        self.product = product
+        self.location = location
+        self.storage = storage
+        self.quantity = quantity
 
     def save(self):
         db.session.add(self)

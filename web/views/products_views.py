@@ -6,6 +6,7 @@ from flask_restplus import Resource
 
 from web import schemas
 from web.api import api
+from web.domain.errors import ProductDoesNotExist, CanNotAcceptAnotherProduct, LocationIsFull
 from web.domain.use_cases import add_product
 from web.views.serializers import add_product_fields, error_fields
 
@@ -25,7 +26,10 @@ class ProductsCollection(Resource):
             product_data = self.add_product_schema.load(request.json)
         except marshmallow.ValidationError as e:
             return ValueError(e)
-        location = add_product(product_data)
+        try:
+            stored_product_id = add_product(product_data)
+        except (ProductDoesNotExist, CanNotAcceptAnotherProduct, LocationIsFull) as e:
+            return 'error', 400
         logger.info(f'product_data: {product_data}')
 
-        return location, 200
+        return stored_product_id, 200

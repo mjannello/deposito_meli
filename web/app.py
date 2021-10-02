@@ -4,7 +4,7 @@ from web.db import db
 from web.api import api
 from web.domain.models.location import Location
 from web.domain.models.product import Product
-from web.domain.models.relationships import ProductLocations
+from web.domain.models.relationships import StoredProducts
 from web.domain.models.storage import Storage
 from web.views.products_views import ns_products
 
@@ -21,8 +21,8 @@ api.add_namespace(ns_products)
 
 def db_seed():
     product1 = Product(id=1, name='nombre 1', type='tipo1')
-    product2 = Product(id=2, name='nombre 1', type='tipo1')
-    product3 = Product(id=3, name='nombre 1', type='tipo1')
+    product2 = Product(id=2, name='nombre 1', type='tipo2')
+    product3 = Product(id=3, name='nombre 1', type='tipo3')
 
     db.session.add(product1)
     db.session.add(product2)
@@ -92,11 +92,11 @@ if __name__ == '__main__':
         db.drop_all()
         db.create_all()
         db_seed()
-        p = Product(id=4, name='nombre 1', type='tipo1')
+        p = Product(id=4, name='nombre 1', type='tipo4')
         loc = Location(area='Limpieza', hall=4, row=2, side='derecha')
         stg = Storage(id=2, name='BR02')
 
-        product_location = ProductLocations(product=p, location=loc, storage=stg, quantity=10)
+        product_location = StoredProducts(product=p, location=loc, storage=stg, quantity=10)
         db.session.add(product_location)
         db.session.commit()
 
