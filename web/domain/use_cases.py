@@ -13,7 +13,7 @@ logging.basicConfig()
 logging.getLogger().setLevel(logging.DEBUG)
 
 
-def add_product(product_data, max_types_in_location, max_products_in_location):
+def add_product(product_data, max_types_in_location, max_products_in_location, meli_repository):
     try:
         input_quantity, location, product, storage = initialize_insertion_deletion_models(product_data)
     except ProductNotFound as e:
@@ -28,7 +28,13 @@ def add_product(product_data, max_types_in_location, max_products_in_location):
         raise e
 
     stored_product_id = StoredProducts.upsert(product=product, location=location, storage=storage, quantity=input_quantity)
+
+    # as the API is not using real Meli's IDs, I left this check commented for future refactors
+    # if not meli_repository.check_logistic_type():
+    #     raise ProductWasNotAdded
+
     logger.info(f'Stored product id: {stored_product_id}')
+
     return product_data
 
 

@@ -9,13 +9,16 @@ from web.infrastructure.api import api
 from web.domain.errors import ProductNotFound, CanNotAcceptAnotherProduct, LocationIsFull, ProductIsNotInLocation, \
     CanNotRemoveThatQuantity
 from web.domain.use_cases import add_product, remove_product
+from web.infrastructure.repositories import MeliRepository
 from web.infrastructure.serializers import add_product_fields, error_fields, remove_product_fields
-from web.infrastructure.settings import MAX_TYPES_IN_LOCATION, MAX_PRODUCTS_IN_LOCATION
+from web.infrastructure.settings import MAX_TYPES_IN_LOCATION, MAX_PRODUCTS_IN_LOCATION, MELI_REPOSITORY_API_URL
 
 logger = logging.getLogger(__name__)
 
 ns_products = api.namespace('products', description='Product Resource')
 error_schema = schemas.Error()
+
+meli_repository = MeliRepository(MELI_REPOSITORY_API_URL)
 
 
 @api.errorhandler(errors.Error)
@@ -38,7 +41,8 @@ class ProductsCollection(Resource):
         except marshmallow.ValidationError as e:
             return ValueError(e)
         try:
-            stored_product = add_product(product_data, MAX_TYPES_IN_LOCATION, MAX_PRODUCTS_IN_LOCATION)
+            stored_product = add_product(product_data, MAX_TYPES_IN_LOCATION, MAX_PRODUCTS_IN_LOCATION,
+                                         meli_repository)
         except ProductNotFound:
             raise errors.ProductNotFound
         except CanNotAcceptAnotherProduct:
