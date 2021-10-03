@@ -9,9 +9,8 @@ from web.infrastructure.views.products_views import ns_products
 from web.infrastructure.views.search_views import ns_search
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://meli_admin:1234@localhost/meli_storage'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///meli_storage.db'
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-app.secret_key = 'secret string'
 
 db.init_app(app)
 api.init_app(app)
@@ -85,10 +84,6 @@ def db_seed():
     db.session.add(Storage(id=2, name='BR02'))
     db.session.add(Storage(id=3, name='CO03'))
 
-    # location1.products.append(product1)
-    # stg.locations.append(location1)
-
-    # db.session.add(stg)
     db.session.commit()
 
 
