@@ -11,7 +11,7 @@ class Error(Schema):
 
     
 class AddProduct(Schema):
-    product = fields.String(required=True)
+    product = fields.Integer(required=True)
     storage = fields.String(required=True)
     location = fields.String(required=True)
     quantity = fields.Integer(required=True)
@@ -24,7 +24,7 @@ class AddProduct(Schema):
 
 
 class RemoveProduct(Schema):
-    product = fields.String(required=True)
+    product = fields.Integer(required=True)
     storage = fields.String(required=True)
     location = fields.String(required=True)
     quantity = fields.Integer(required=True)

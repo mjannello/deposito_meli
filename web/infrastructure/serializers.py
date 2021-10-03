@@ -5,7 +5,7 @@ from web.infrastructure.api import api
 add_product_fields = api.model(
     'Add product fields',
     {
-        'product': fields.String(example="MLB12345"),
+        'product': fields.Integer(example=1),
         'storage': fields.String(example="AR01"),
         'location': fields.String(example="LM-00-00-IZ"),
         'quantity': fields.Integer(example=10)
@@ -15,7 +15,7 @@ add_product_fields = api.model(
 remove_product_fields = api.model(
     'Remove product fields',
     {
-        'product': fields.String(example="MLB12345"),
+        'product': fields.Integer(example=1),
         'storage': fields.String(example="AR01"),
         'location': fields.String(example="LM-00-00-IZ"),
         'quantity': fields.Integer(example=10)

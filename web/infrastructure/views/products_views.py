@@ -51,7 +51,7 @@ class ProductsCollection(Resource):
             raise errors.LocationFull
         logger.info(f'product_data: {product_data}')
 
-        return self.add_product_schema.dump(stored_product), 200
+        return self.add_product_schema.dump(stored_product), 201
 
     @ns_products.response(202, 'Removed', remove_product_fields)
     @ns_products.response(400, 'Bad Request', error_fields)
