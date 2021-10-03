@@ -34,3 +34,16 @@ class RemoveProduct(Schema):
         r = re.compile("^[A-Z]{2}-\d{2}-\d{2}-(DE|IZ)$")
         if not r.match(value):
             raise ValueError
+
+
+class ReadLocation(Schema):
+    storage = fields.String(required=True)
+    location = fields.String(required=True)
+    products = fields.Dict(required=True)
+
+
+class SearchLocation(Schema):
+    product = fields.String(required=True)
+    storage = fields.String(required=True)
+    locations = fields.List(fields.Dict(), required=True)
+

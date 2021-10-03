@@ -31,7 +31,7 @@ class ProductsCollection(Resource):
     add_product_schema = schemas.AddProduct()
     remove_product_schema = schemas.RemoveProduct()
 
-    @ns_products.response(201, 'Inserted')
+    @ns_products.response(201, 'Inserted', add_product_fields)
     @ns_products.response(400, 'Bad Request', error_fields)
     @ns_products.response(404, 'Not Found', error_fields)
     @api.expect(add_product_fields, validate=True)
@@ -53,7 +53,7 @@ class ProductsCollection(Resource):
 
         return self.add_product_schema.dump(stored_product), 200
 
-    @ns_products.response(202, 'Removed')
+    @ns_products.response(202, 'Removed', remove_product_fields)
     @ns_products.response(400, 'Bad Request', error_fields)
     @api.expect(remove_product_fields, validate=True)
     def put(self):
@@ -70,6 +70,6 @@ class ProductsCollection(Resource):
         except CanNotRemoveThatQuantity:
             raise errors.CanNotRemoveThatQuantity
 
-        return self.add_product_schema.dump(removed_product), 202
+        return self.remove_product_schema.dump(removed_product), 202
 
 
