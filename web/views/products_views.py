@@ -8,13 +8,15 @@ from web import schemas
 from web.api import api
 from web.domain.errors import ProductNotFound, CanNotAcceptAnotherProduct, LocationIsFull, ProductIsNotInLocation, \
     CanNotRemoveThatQuantity
-from web.domain.use_cases import add_product, remove_product, get_products_in_location
+from web.domain.use_cases import add_product, remove_product, get_products_in_location, search_locations_in_storage
 from web.serializers import add_product_fields, error_fields, remove_product_fields
 
 logger = logging.getLogger(__name__)
 
 ns_products = api.namespace('products', description='Product Resource')
 ns_locations = api.namespace('locations', description='LocationResource')
+ns_search = api.namespace('search', description='SearchResource')
+
 
 @ns_products.route('/')
 class ProductsCollection(Resource):
@@ -56,11 +58,24 @@ class ProductsCollection(Resource):
 
 @ns_locations.route('/<storage>/<location_string>')
 class LocationsCollection(Resource):
-    @ns_products.response(200, 'Success')
-    @ns_products.response(400, 'Bad Request', error_fields)
+    @ns_locations.response(200, 'Success')
+    @ns_locations.response(400, 'Bad Request', error_fields)
     def get(self, storage, location_string):
         try:
             products = get_products_in_location(storage, location_string)
+        except ValueError as e:
+            return 'error', 400
+
+        return products, 200
+
+
+@ns_search.route('/<storage>/<product_id>')
+class SearchCollection(Resource):
+    @ns_search.response(200, 'Success')
+    @ns_search.response(400, 'Bad Request', error_fields)
+    def get(self, storage, product_id):
+        try:
+            products = search_locations_in_storage(storage, product_id)
         except (ProductNotFound, ProductIsNotInLocation, CanNotRemoveThatQuantity) as e:
             return 'error', 400
 

@@ -6,7 +6,7 @@ from web.domain.models.location import Location
 from web.domain.models.product import Product
 from web.domain.models.relationships import StoredProducts
 from web.domain.models.storage import Storage
-from web.views.products_views import ns_products, ns_locations
+from web.views.products_views import ns_products, ns_locations, ns_search
 
 app = Flask(__name__)
 # migrate = Migrate(app, db)
@@ -18,6 +18,7 @@ db.init_app(app)
 api.init_app(app)
 api.add_namespace(ns_products)
 api.add_namespace(ns_locations)
+api.add_namespace(ns_search)
 
 
 def db_seed():
@@ -80,6 +81,9 @@ def db_seed():
 
     stg = Storage(id=1, name='AR01')
     db.session.add(stg)
+
+    db.session.add(Storage(id=2, name='BR02'))
+    db.session.add(Storage(id=3, name='CO03'))
 
     # location1.products.append(product1)
     # stg.locations.append(location1)

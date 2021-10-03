@@ -1,3 +1,5 @@
+from sqlalchemy import func
+
 from web.db import db
 
 
@@ -35,9 +37,21 @@ class StoredProducts(db.Model):
     @classmethod
     def remove(cls, stored_product, removal_quantity):
         stored_product.quantity -= removal_quantity
+        if stored_product.quantity == 0:
+            deleted_id = stored_product.id
+            stored_product.delete()
+            return deleted_id
         stored_product.save()
         return stored_product.product.id
 
+    @classmethod
+    def get_locations_in_storage(cls, storage, product):
+        return cls.query.filter_by(product=product, storage=storage).all()
+
     def save(self):
         db.session.add(self)
+        db.session.commit()
+
+    def delete(self):
+        db.session.delete(self)
         db.session.commit()

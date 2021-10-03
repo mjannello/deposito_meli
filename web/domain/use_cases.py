@@ -1,5 +1,8 @@
 import logging
 
+from sqlalchemy import func
+
+from web.db import db
 from web.domain.errors import ProductNotFound, LocationIsFull, CanNotAcceptAnotherProduct, ProductIsNotInLocation, \
     CanNotRemoveThatQuantity
 from web.domain.models.location import Location
@@ -96,5 +99,22 @@ def get_products_in_location(storage_name, location_string):
 
     stored_product = StoredProducts.get_all_products_in_location(storage, location)
     products = {sp.product.id: sp.quantity for sp in stored_product if sp.quantity > 0}
-    response = {'location': location_string, 'storage':storage_name, 'products': products}
+    response = {'location': location_string, 'storage': storage_name, 'products': products}
     return response
+
+
+def search_locations_in_storage(storage_name, product_id):
+    storage = Storage.get_storage(storage_name)
+    product = Product.find_by_id(product_id)
+
+    stored_products = StoredProducts.get_locations_in_storage(storage, product)
+    locations = []
+    for sp in stored_products:
+        locations.append({
+            'area': sp.location.area,
+            'hall': sp.location.hall,
+            'row': sp.location.row,
+            'side': sp.location.side,
+            'quantity': sp.quantity})
+
+    return {'product': product_id, 'storage': storage_name, 'locations': locations}
