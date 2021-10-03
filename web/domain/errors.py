@@ -20,3 +20,11 @@ class ProductIsNotInLocation(Exception):
 
 class CanNotRemoveThatQuantity(Exception):
     pass
+
+
+class StorageNotFound(Exception):
+    pass
+
+
+class InvalidLocationString(Exception):
+    pass

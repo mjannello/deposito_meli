@@ -1,4 +1,4 @@
-from web.db import db
+from infrastructure.db import db
 from web.domain.errors import InvalidArea
 
 

@@ -4,9 +4,8 @@ from web.db import db
 from web.api import api
 from web.domain.models.location import Location
 from web.domain.models.product import Product
-from web.domain.models.relationships import StoredProducts
 from web.domain.models.storage import Storage
-from web.views.products_views import ns_products, ns_locations, ns_search
+from infrastructure.views.products_views import ns_products, ns_locations, ns_search
 
 app = Flask(__name__)
 # migrate = Migrate(app, db)

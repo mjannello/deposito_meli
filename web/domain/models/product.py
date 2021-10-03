@@ -1,5 +1,5 @@
 import logging
-from web.db import db
+from infrastructure.db import db
 
 
 logger = logging.getLogger(__name__)

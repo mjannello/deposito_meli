@@ -1,17 +1,14 @@
 import logging
 
-from sqlalchemy import func
-
-from web.db import db
 from web.domain.errors import ProductNotFound, LocationIsFull, CanNotAcceptAnotherProduct, ProductIsNotInLocation, \
-    CanNotRemoveThatQuantity
+    CanNotRemoveThatQuantity, InvalidArea, StorageNotFound, InvalidLocationString
 from web.domain.models.location import Location
 from web.domain.models.product import Product
 from web.domain.models.relationships import StoredProducts
 from web.domain.models.storage import Storage
 from web.domain.utils import validate_location_string
-from web.settings import MAX_TYPES_IN_LOCATION
-from web.settings import MAX_PRODUCTS_IN_LOCATION
+from infrastructure.settings import MAX_TYPES_IN_LOCATION
+from infrastructure.settings import MAX_PRODUCTS_IN_LOCATION
 
 logger = logging.getLogger(__name__)
 logging.basicConfig()
@@ -33,7 +30,7 @@ def add_product(product_data):
 
     stored_product_id = StoredProducts.upsert(product=product, location=location, storage=storage, quantity=input_quantity)
     logger.info(f'Stored product id: {stored_product_id}')
-    return stored_product_id
+    return product_data
 
 
 def initialize_insertion_deletion_models(product_data):
@@ -79,7 +76,7 @@ def remove_product(product_data):
 
     removed_product_id = StoredProducts.remove(stored_product, removal_quantity=removal_quantity)
     logger.info(f'Removed product id: {removed_product_id}')
-    return removed_product_id
+    return product_data
 
 
 def can_remove_product(stored_product, removal_quantity):
@@ -92,11 +89,16 @@ def can_remove_product(stored_product, removal_quantity):
 def get_products_in_location(storage_name, location_string):
     try:
         validate_location_string(location_string)
-    except ValueError as e:
+    except ValueError:
+        raise InvalidLocationString
+    try:
+        location = Location.parse(location_string)
+    except InvalidArea as e:
         raise e
-    location = Location.parse(location_string)
+    # storage is not being validated
     storage = Storage.get_storage(storage_name)
-
+    if not storage:
+        raise StorageNotFound
     stored_product = StoredProducts.get_all_products_in_location(storage, location)
     products = {sp.product.id: sp.quantity for sp in stored_product if sp.quantity > 0}
     response = {'location': location_string, 'storage': storage_name, 'products': products}
@@ -105,8 +107,12 @@ def get_products_in_location(storage_name, location_string):
 
 def search_locations_in_storage(storage_name, product_id):
     storage = Storage.get_storage(storage_name)
+    if not storage:
+        raise StorageNotFound
     product = Product.find_by_id(product_id)
-
+    if not product:
+        raise ProductNotFound
+    
     stored_products = StoredProducts.get_locations_in_storage(storage, product)
     locations = []
     for sp in stored_products:

@@ -1,6 +1,4 @@
-from sqlalchemy import func
-
-from web.db import db
+from infrastructure.db import db
 
 
 class StoredProducts(db.Model):

@@ -1,4 +1,4 @@
-from web.db import db
+from infrastructure.db import db
 
 
 class Storage(db.Model):
