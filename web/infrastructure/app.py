@@ -1,5 +1,5 @@
 from flask import Flask
-from web.infrastructure.db import db
+from web.domain.models.db import db
 from web.infrastructure.api import api
 from web.domain.models.location import Location
 from web.domain.models.product import Product

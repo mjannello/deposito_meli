@@ -10,6 +10,7 @@ from web.domain.errors import ProductNotFound, CanNotAcceptAnotherProduct, Locat
     CanNotRemoveThatQuantity
 from web.domain.use_cases import add_product, remove_product
 from web.infrastructure.serializers import add_product_fields, error_fields, remove_product_fields
+from web.infrastructure.settings import MAX_TYPES_IN_LOCATION, MAX_PRODUCTS_IN_LOCATION
 
 logger = logging.getLogger(__name__)
 
@@ -37,7 +38,7 @@ class ProductsCollection(Resource):
         except marshmallow.ValidationError as e:
             return ValueError(e)
         try:
-            stored_product = add_product(product_data)
+            stored_product = add_product(product_data, MAX_TYPES_IN_LOCATION, MAX_PRODUCTS_IN_LOCATION)
         except ProductNotFound:
             raise errors.ProductNotFound
         except CanNotAcceptAnotherProduct:

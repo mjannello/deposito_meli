@@ -7,14 +7,13 @@ from web.domain.models.product import Product
 from web.domain.models.relationships import StoredProducts
 from web.domain.models.storage import Storage
 from web.domain.utils import validate_location_string
-from web.infrastructure.settings import MAX_PRODUCTS_IN_LOCATION, MAX_TYPES_IN_LOCATION
 
 logger = logging.getLogger(__name__)
 logging.basicConfig()
 logging.getLogger().setLevel(logging.DEBUG)
 
 
-def add_product(product_data):
+def add_product(product_data, max_types_in_location, max_products_in_location):
     try:
         input_quantity, location, product, storage = initialize_insertion_deletion_models(product_data)
     except ProductNotFound as e:
@@ -23,7 +22,8 @@ def add_product(product_data):
     types_of_products_stored, quantity_stored = get_type_products_and_quantity_stored(location, storage)
 
     try:
-        can_insert_product(types_of_products_stored, quantity_stored, product.type, input_quantity)
+        can_insert_product(types_of_products_stored, quantity_stored, product.type, input_quantity,
+                           max_types_in_location, max_products_in_location)
     except (CanNotAcceptAnotherProduct, LocationIsFull) as e:
         raise e
 
@@ -52,11 +52,12 @@ def get_type_products_and_quantity_stored(location, storage):
     return types_of_products_stored, quantity_storaged
 
 
-def can_insert_product(types_of_products_stored, quantity_stored, input_product_type, input_quantity):
-    if len(types_of_products_stored) == MAX_TYPES_IN_LOCATION and input_product_type not in types_of_products_stored:
+def can_insert_product(types_of_products_stored, quantity_stored, input_product_type, input_quantity,
+                       max_types_in_location, max_products_in_location):
+    if len(types_of_products_stored) == max_types_in_location and input_product_type not in types_of_products_stored:
         raise CanNotAcceptAnotherProduct
 
-    if quantity_stored + input_quantity > MAX_PRODUCTS_IN_LOCATION:
+    if quantity_stored + input_quantity > max_products_in_location:
         raise LocationIsFull
 
 
