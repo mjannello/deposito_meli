@@ -4,7 +4,9 @@ from web.infrastructure.api import api
 from web.domain.models.location import Location
 from web.domain.models.product import Product
 from web.domain.models.storage import Storage
-from web.infrastructure.views.products_views import ns_products, ns_locations, ns_search
+from web.infrastructure.views.location_views import ns_locations
+from web.infrastructure.views.products_views import ns_products
+from web.infrastructure.views.search_views import ns_search
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://meli_admin:1234@localhost/meli_storage'

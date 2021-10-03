@@ -1,5 +1,6 @@
 from web.infrastructure.db import db
 
+
 class StoredProducts(db.Model):
     __tablename__ = 'stored_products'
     id = db.Column(db.Integer, primary_key=True)

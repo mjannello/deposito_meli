@@ -7,15 +7,13 @@ from flask_restplus import Resource
 from web.infrastructure import schemas, errors
 from web.infrastructure.api import api
 from web.domain.errors import ProductNotFound, CanNotAcceptAnotherProduct, LocationIsFull, ProductIsNotInLocation, \
-    CanNotRemoveThatQuantity, InvalidLocationString, StorageNotFound
-from web.domain.use_cases import add_product, remove_product, get_products_in_location, search_locations_in_storage
+    CanNotRemoveThatQuantity
+from web.domain.use_cases import add_product, remove_product
 from web.infrastructure.serializers import add_product_fields, error_fields, remove_product_fields
 
 logger = logging.getLogger(__name__)
 
 ns_products = api.namespace('products', description='Product Resource')
-ns_locations = api.namespace('locations', description='LocationResource')
-ns_search = api.namespace('search', description='SearchResource')
 error_schema = schemas.Error()
 
 
@@ -70,30 +68,3 @@ class ProductsCollection(Resource):
         return self.add_product_schema.dump(removed_product), 202
 
 
-@ns_locations.route('/<storage>/<location_string>')
-class LocationsCollection(Resource):
-    @ns_locations.response(200, 'Success')
-    @ns_locations.response(400, 'Bad Request', error_fields)
-    def get(self, storage, location_string):
-        try:
-            products = get_products_in_location(storage, location_string)
-        except InvalidLocationString:
-            raise errors.InvalidLocationString
-        except StorageNotFound:
-            raise errors.StorageNotFound
-        return products, 200
-
-
-@ns_search.route('/<storage>/<product_id>')
-class SearchCollection(Resource):
-    @ns_search.response(200, 'Success')
-    @ns_search.response(400, 'Bad Request', error_fields)
-    def get(self, storage, product_id):
-        try:
-            products = search_locations_in_storage(storage, product_id)
-        except ProductNotFound:
-            raise errors.ProductNotFound
-        except (ProductIsNotInLocation, CanNotRemoveThatQuantity) as e:
-            return 'error', 400
-
-        return products, 200
