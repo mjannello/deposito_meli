@@ -3,6 +3,13 @@ from marshmallow import Schema, fields, validates
 import re
 
 
+class Error(Schema):
+    title = fields.String(required=True)
+    message = fields.String(required=True)
+    status_code = fields.String(required=True)
+    error_code = fields.String(required=True)
+
+    
 class AddProduct(Schema):
     product = fields.String(required=True)
     storage = fields.String(required=True)

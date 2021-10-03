@@ -1,14 +1,12 @@
 from flask import Flask
-# from flask_migrate import Migrate
-from web.db import db
-from web.api import api
+from web.infrastructure.db import db
+from web.infrastructure.api import api
 from web.domain.models.location import Location
 from web.domain.models.product import Product
 from web.domain.models.storage import Storage
-from infrastructure.views.products_views import ns_products, ns_locations, ns_search
+from web.infrastructure.views.products_views import ns_products, ns_locations, ns_search
 
 app = Flask(__name__)
-# migrate = Migrate(app, db)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://meli_admin:1234@localhost/meli_storage'
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 app.secret_key = 'secret string'
@@ -22,12 +20,13 @@ api.add_namespace(ns_search)
 
 def db_seed():
     product1 = Product(id=1, name='nombre 1', type='tipo1')
-    product2 = Product(id=2, name='nombre 1', type='tipo2')
-    product3 = Product(id=3, name='nombre 1', type='tipo3')
-
+    product2 = Product(id=2, name='nombre 2', type='tipo2')
+    product3 = Product(id=3, name='nombre 3', type='tipo3')
+    product4 = Product(id=4, name='nombre 4', type='tipo4')
     db.session.add(product1)
     db.session.add(product2)
     db.session.add(product3)
+    db.session.add(product4)
 
     areas = ['Limpieza', 'Almacen', 'Seguridad']
 

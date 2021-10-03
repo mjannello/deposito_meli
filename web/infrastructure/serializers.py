@@ -1,6 +1,6 @@
 from flask_restplus import fields
 
-from web.api import api
+from web.infrastructure.api import api
 
 add_product_fields = api.model(
     'Add product fields',

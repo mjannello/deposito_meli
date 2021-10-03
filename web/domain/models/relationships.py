@@ -1,5 +1,4 @@
-from infrastructure.db import db
-
+from web.infrastructure.db import db
 
 class StoredProducts(db.Model):
     __tablename__ = 'stored_products'

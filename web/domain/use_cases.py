@@ -7,8 +7,7 @@ from web.domain.models.product import Product
 from web.domain.models.relationships import StoredProducts
 from web.domain.models.storage import Storage
 from web.domain.utils import validate_location_string
-from infrastructure.settings import MAX_TYPES_IN_LOCATION
-from infrastructure.settings import MAX_PRODUCTS_IN_LOCATION
+from web.infrastructure.settings import MAX_PRODUCTS_IN_LOCATION, MAX_TYPES_IN_LOCATION
 
 logger = logging.getLogger(__name__)
 logging.basicConfig()
@@ -112,7 +111,7 @@ def search_locations_in_storage(storage_name, product_id):
     product = Product.find_by_id(product_id)
     if not product:
         raise ProductNotFound
-    
+
     stored_products = StoredProducts.get_locations_in_storage(storage, product)
     locations = []
     for sp in stored_products:

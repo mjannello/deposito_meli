@@ -1,5 +1,5 @@
-from infrastructure.db import db
 from web.domain.errors import InvalidArea
+from web.infrastructure.db import db
 
 
 class Location(db.Model):
