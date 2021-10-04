@@ -1,6 +1,6 @@
 import logging
 
-from web.domain.errors import StorageNotFound, ProductNotFound
+from web.domain.errors import StorageNotFound, ProductNotFound, InvalidProductId
 from web.domain.models.product import Product
 from web.domain.models.relationships import StoredProducts
 from web.domain.models.storage import Storage
@@ -9,10 +9,14 @@ logger = logging.getLogger(__name__)
 
 
 def search_locations_in_storage(storage_name, product_id):
+    """Method to search all locations from the given storage that contains given product_id"""
     storage = Storage.get_storage(storage_name)
     if not storage:
         raise StorageNotFound
-    product = Product.find_by_id(product_id)
+    try:
+        product = Product.find_by_id(product_id)
+    except InvalidProductId as e:
+        raise e
     if not product:
         raise ProductNotFound
 

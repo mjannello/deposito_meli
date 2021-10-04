@@ -1,4 +1,8 @@
 import logging
+
+from sqlalchemy.exc import DataError
+
+from web.domain.errors import InvalidProductId
 from web.domain.models.db import db
 
 
@@ -15,7 +19,10 @@ class Product(db.Model):
     @classmethod
     def find_by_id(cls, _id):
         logger.debug(f'Find product by id: {_id}')
-        product = cls.query.get(_id)
+        try:
+            product = cls.query.get(_id)
+        except DataError:
+            raise InvalidProductId
         return product
 
 

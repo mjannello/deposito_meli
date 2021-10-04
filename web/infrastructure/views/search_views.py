@@ -1,6 +1,6 @@
 from flask_restplus import Resource
 
-from web.domain.errors import ProductNotFound, StorageNotFound
+from web.domain.errors import ProductNotFound, StorageNotFound, InvalidProductId
 from web.domain.use_cases.locations_use_cases import search_locations_in_storage
 from web.infrastructure import errors, schemas
 from web.infrastructure.api import api
@@ -18,8 +18,10 @@ class SearchCollection(Resource):
     def get(self, storage, product_id):
         try:
             locations = search_locations_in_storage(storage, product_id)
+        except InvalidProductId:
+            raise errors.InvalidProductIdError
         except ProductNotFound:
-            raise errors.ProductNotFound
+            raise errors.ProductNotFoundError
         except StorageNotFound:
-            raise errors.StorageNotFound
+            raise errors.StorageNotFoundError
         return self.search_location_schema.dump(locations), 200

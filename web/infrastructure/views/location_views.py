@@ -19,7 +19,7 @@ class LocationsCollection(Resource):
         try:
             products = get_products_in_location(storage, location_string)
         except InvalidLocationString:
-            raise errors.InvalidLocationString
+            raise errors.InvalidLocationStringError
         except StorageNotFound:
-            raise errors.StorageNotFound
+            raise errors.StorageNotFoundError
         return self.read_location_schema.dump(products), 200

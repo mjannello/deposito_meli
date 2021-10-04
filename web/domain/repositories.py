@@ -19,6 +19,6 @@ class MeliRepository:
 
         if response.status_code == 404:
             logger.error('Error Product was not found')
-            raise errors.ProductIsNotInLocation
+            raise errors.ProductIsNotInLocationError
         if response.status_code == 200:
             return response.json()['logistic_type'] == 'fulfillment'
