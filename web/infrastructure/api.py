@@ -6,6 +6,5 @@ api = Api(
     contact_email='matijannello@gmail.com',
     description=(
         'API to manage MercadoLibre\'s storage'
-    ),
-    validate=True
+    )
 )

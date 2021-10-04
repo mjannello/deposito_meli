@@ -1,6 +1,6 @@
 from flask_restplus import Resource
 from web.domain.errors import InvalidLocationString, StorageNotFound
-from web.domain.use_cases import get_products_in_location
+from web.domain.use_cases.product_use_cases import get_products_in_location
 from web.infrastructure import errors, schemas
 from web.infrastructure.api import api
 from web.infrastructure.serializers import error_fields

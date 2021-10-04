@@ -1,7 +1,8 @@
 import pytest
 
 from web.domain.errors import ProductNotFound, CanNotAcceptAnotherProduct, LocationIsFull
-from web.domain.use_cases import add_product, initialize_insertion_deletion_models, can_insert_product, remove_product
+from web.domain.use_cases.product_use_cases import add_product, initialize_insertion_deletion_models, can_insert_product,\
+    remove_product
 
 
 @pytest.fixture
@@ -34,8 +35,7 @@ class TestAddProduct:
     def test_add_product_product_not_found(self, mocker):
         mocker.patch('web.domain.use_cases.initialize_insertion_deletion_models', side_effect=ProductNotFound)
         with pytest.raises(ProductNotFound):
-            add_product(mocked_product_insert_data, max_types_in_location=3, max_products_in_location=100,
-                        meli_repository=meli_repository)
+            add_product(mocked_product_insert_data)
 
     def test_add_product_cannot_insert_max_type_of_products_reached(self, mocker):
         class MockProduct:
@@ -45,8 +45,7 @@ class TestAddProduct:
         mocker.patch('web.domain.use_cases.get_type_products_and_quantity_stored', return_value=['fake_type', 1])
         mocker.patch('web.domain.use_cases.can_insert_product', side_effect=CanNotAcceptAnotherProduct)
         with pytest.raises(CanNotAcceptAnotherProduct):
-            add_product(mocked_product_insert_data, max_types_in_location=3, max_products_in_location=100
-                        , meli_repository=meli_repository)
+            add_product(mocked_product_insert_data)
 
     def test_add_product_cannot_insert_location_is_full(self, mocker):
         class MockProduct:
@@ -56,8 +55,7 @@ class TestAddProduct:
         mocker.patch('web.domain.use_cases.get_type_products_and_quantity_stored', return_value=['fake_type', 1])
         mocker.patch('web.domain.use_cases.can_insert_product', side_effect=LocationIsFull)
         with pytest.raises(LocationIsFull):
-            add_product(mocked_product_insert_data, max_types_in_location=3, max_products_in_location=100,
-                        meli_repository=meli_repository)
+            add_product(mocked_product_insert_data)
 
     def test_initialize_insertion_deletion_models_successfully(self, mocker, mocked_product_insert_data):
         mocker.patch('web.domain.models.product.Product.find_by_id', return_value='product')
@@ -77,13 +75,11 @@ class TestAddProduct:
             m.setenv('MAX_TYPES_IN_LOCATION', 3)
             m.setenv('MAX_PRODUCTS_IN_LOCATION', 100)
             with pytest.raises(CanNotAcceptAnotherProduct):
-                can_insert_product(['type1', 'type2', 'type3'], 10, 'type 4', 30,
-                               max_types_in_location=3, max_products_in_location=100)
+                can_insert_product(['type1', 'type2', 'type3'], 10, 'type 4', 30)
 
-    def test_can_insert_product_location_is_full(self, monkeypatch):
+    def test_can_insert_product_location_is_full(self):
         with pytest.raises(LocationIsFull):
-            can_insert_product(['type1'], 90, 'type 2', 20,
-                               max_types_in_location=3, max_products_in_location=100)
+            can_insert_product(['type1'], 90, 'type 2', 20)
 
 
 class TestRemoveProduct:

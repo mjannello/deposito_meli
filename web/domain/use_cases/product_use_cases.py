@@ -1,19 +1,24 @@
 import logging
 
-from web.domain.errors import ProductNotFound, LocationIsFull, CanNotAcceptAnotherProduct, ProductIsNotInLocation, \
-    CanNotRemoveThatQuantity, InvalidArea, StorageNotFound, InvalidLocationString
+from web.domain.errors import ProductNotFound, CanNotAcceptAnotherProduct, LocationIsFull, ProductIsNotInLocation, \
+    CanNotRemoveThatQuantity, InvalidLocationString, InvalidArea, StorageNotFound
 from web.domain.models.location import Location
 from web.domain.models.product import Product
 from web.domain.models.relationships import StoredProducts
 from web.domain.models.storage import Storage
+from web.domain.repositories import MeliRepository
 from web.domain.utils import validate_location_string
+
+MAX_TYPES_IN_LOCATION = 3
+MAX_PRODUCTS_IN_LOCATION = 100
+meli_repository = MeliRepository()
 
 logger = logging.getLogger(__name__)
 logging.basicConfig()
 logging.getLogger().setLevel(logging.DEBUG)
 
 
-def add_product(product_data, max_types_in_location, max_products_in_location, meli_repository):
+def add_product(product_data):
     try:
         input_quantity, location, product, storage = initialize_insertion_deletion_models(product_data)
     except ProductNotFound as e:
@@ -22,8 +27,7 @@ def add_product(product_data, max_types_in_location, max_products_in_location, m
     types_of_products_stored, quantity_stored = get_type_products_and_quantity_stored(location, storage)
 
     try:
-        can_insert_product(types_of_products_stored, quantity_stored, product.type, input_quantity,
-                           max_types_in_location, max_products_in_location)
+        can_insert_product(types_of_products_stored, quantity_stored, product.type, input_quantity)
     except (CanNotAcceptAnotherProduct, LocationIsFull) as e:
         raise e
 
@@ -58,12 +62,11 @@ def get_type_products_and_quantity_stored(location, storage):
     return types_of_products_stored, quantity_storaged
 
 
-def can_insert_product(types_of_products_stored, quantity_stored, input_product_type, input_quantity,
-                       max_types_in_location, max_products_in_location):
-    if len(types_of_products_stored) == max_types_in_location and input_product_type not in types_of_products_stored:
+def can_insert_product(types_of_products_stored, quantity_stored, input_product_type, input_quantity):
+    if len(types_of_products_stored) == MAX_TYPES_IN_LOCATION and input_product_type not in types_of_products_stored:
         raise CanNotAcceptAnotherProduct
 
-    if quantity_stored + input_quantity > max_products_in_location:
+    if quantity_stored + input_quantity > MAX_PRODUCTS_IN_LOCATION:
         raise LocationIsFull
 
 
@@ -101,32 +104,9 @@ def get_products_in_location(storage_name, location_string):
         location = Location.parse(location_string)
     except InvalidArea as e:
         raise e
-    # storage is not being validated
     storage = Storage.get_storage(storage_name)
     if not storage:
         raise StorageNotFound
     stored_product = StoredProducts.get_all_products_in_location(storage, location)
     products = {sp.product.id: sp.quantity for sp in stored_product if sp.quantity > 0}
-    response = {'location': location_string, 'storage': storage_name, 'products': products}
-    return response
-
-
-def search_locations_in_storage(storage_name, product_id):
-    storage = Storage.get_storage(storage_name)
-    if not storage:
-        raise StorageNotFound
-    product = Product.find_by_id(product_id)
-    if not product:
-        raise ProductNotFound
-
-    stored_products = StoredProducts.get_locations_in_storage(storage, product)
-    locations = []
-    for sp in stored_products:
-        locations.append({
-            'area': sp.location.area,
-            'hall': sp.location.hall,
-            'row': sp.location.row,
-            'side': sp.location.side,
-            'quantity': sp.quantity})
-
-    return {'product': product_id, 'storage': storage_name, 'locations': locations}
+    return {'location': location_string, 'storage': storage_name, 'products': products}

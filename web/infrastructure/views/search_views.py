@@ -1,7 +1,7 @@
 from flask_restplus import Resource
 
-from web.domain.errors import ProductNotFound, ProductIsNotInLocation, CanNotRemoveThatQuantity, StorageNotFound
-from web.domain.use_cases import search_locations_in_storage
+from web.domain.errors import ProductNotFound, StorageNotFound
+from web.domain.use_cases.locations_use_cases import search_locations_in_storage
 from web.infrastructure import errors, schemas
 from web.infrastructure.api import api
 from web.infrastructure.serializers import error_fields

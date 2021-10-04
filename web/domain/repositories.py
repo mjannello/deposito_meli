@@ -5,10 +5,12 @@ from web.infrastructure import errors
 
 logger = logging.getLogger(__name__)
 
+MELI_REPOSITORY_API_URL = 'https://api.mercadolibre.com/items/'
+
 
 class MeliRepository:
-    def __init__(self, api_url):
-        self.api_url = api_url
+    def __init__(self):
+        self.api_url = MELI_REPOSITORY_API_URL
 
     def check_logistic_type(self, product_id):
         response = requests.get(
