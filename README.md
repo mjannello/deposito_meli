@@ -60,8 +60,10 @@ Documento Swagger:  `http://127.0.0.1:5000/`
 | |────domain/
 | | |────__init__.py
 | | |────models/
+| | |────use_cases/
 | | |────tests/
 | |────infrastructure/
+| | |────__init__.py
 | | |────views/
 
 ```

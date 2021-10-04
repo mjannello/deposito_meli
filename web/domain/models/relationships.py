@@ -1,3 +1,5 @@
+from sqlalchemy.exc import SQLAlchemyError
+
 from web.domain.models.db import db
 
 
@@ -16,21 +18,32 @@ class StoredProducts(db.Model):
 
     @classmethod
     def upsert(cls, product, location, storage, quantity):
-        stored_product = cls.get_product_in_location(product, location, storage)
-        if not stored_product:
-            stored_product = cls(product=product, location=location, storage=storage, quantity=quantity)
-        else:
-            stored_product.quantity += quantity
-        stored_product.save()
+        try:
+            stored_product = cls.get_product_in_location(product, location, storage)
+            if not stored_product:
+                stored_product = cls(product=product, location=location, storage=storage, quantity=quantity)
+            else:
+                stored_product.quantity += quantity
+            stored_product.save()
+        except SQLAlchemyError as e:
+            raise e
         return stored_product.product.id
 
     @classmethod
     def get_all_products_in_location(cls, storage, location):
-        return cls.query.filter_by(location=location, storage=storage).all()
+        try:
+            products_in_location = cls.query.filter_by(location=location, storage=storage).all()
+        except SQLAlchemyError as e:
+            raise e
+        return products_in_location
 
     @classmethod
     def get_product_in_location(cls, product, location, storage):
-        return cls.query.filter_by(product=product, location=location, storage=storage).first()
+        try:
+            product_in_location = cls.query.filter_by(product=product, location=location, storage=storage).first()
+        except SQLAlchemyError as e:
+            raise e
+        return product_in_location
 
     @classmethod
     def remove(cls, stored_product, removal_quantity):
@@ -44,7 +57,11 @@ class StoredProducts(db.Model):
 
     @classmethod
     def get_locations_in_storage(cls, storage, product):
-        return cls.query.filter_by(product=product, storage=storage).all()
+        try:
+            locations = cls.query.filter_by(product=product, storage=storage).all()
+        except SQLAlchemyError as e:
+            raise e
+        return locations
 
     def save(self):
         db.session.add(self)

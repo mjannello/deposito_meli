@@ -28,3 +28,15 @@ class StorageNotFound(Exception):
 
 class InvalidLocationString(Exception):
     pass
+
+
+class ErrorFetchingData(Exception):
+    pass
+
+
+class InvalidProductId(Exception):
+    pass
+
+
+class ErrorInsertingData(Exception):
+    pass

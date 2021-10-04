@@ -7,7 +7,7 @@ from flask_restplus import Resource
 from web.infrastructure import schemas, errors
 from web.infrastructure.api import api
 from web.domain.errors import ProductNotFound, CanNotAcceptAnotherProduct, LocationIsFull, ProductIsNotInLocation, \
-    CanNotRemoveThatQuantity
+    CanNotRemoveThatQuantity, ErrorInsertingData
 from web.domain.use_cases.product_use_cases import add_product, remove_product
 from web.infrastructure.serializers import add_product_fields, error_fields, remove_product_fields
 
@@ -37,14 +37,17 @@ class ProductsCollection(Resource):
         except marshmallow.ValidationError as e:
             return ValueError(e)
         try:
+
             stored_product = add_product(product_data)
+
         except ProductNotFound:
-            raise errors.ProductNotFound
+            raise errors.ProductNotFoundError
         except CanNotAcceptAnotherProduct:
-            raise errors.CanNotAcceptAnotherProduct
+            raise errors.CanNotAcceptAnotherProductError
         except LocationIsFull:
-            raise errors.LocationFull
-        logger.info(f'product_data: {product_data}')
+            raise errors.LocationFullError
+        except ErrorInsertingData:
+            raise errors.InsertingDataError
 
         return self.add_product_schema.dump(stored_product), 201
 
@@ -53,17 +56,21 @@ class ProductsCollection(Resource):
     @api.expect(remove_product_fields, validate=True)
     def put(self):
         try:
+
             product_data = self.remove_product_schema.load(request.json)
+
         except marshmallow.ValidationError as e:
             raise ValueError(e)
         try:
+
             removed_product = remove_product(product_data)
+
         except ProductNotFound:
-            raise errors.ProductNotFound
+            raise errors.ProductNotFoundError
         except ProductIsNotInLocation:
-            raise errors.ProductIsNotInLocation
+            raise errors.ProductIsNotInLocationError
         except CanNotRemoveThatQuantity:
-            raise errors.CanNotRemoveThatQuantity
+            raise errors.CanNotRemoveThatQuantityError
 
         return self.remove_product_schema.dump(removed_product), 202
 
