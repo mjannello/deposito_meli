@@ -1,4 +1,5 @@
 from flask_restplus import Resource
+from sqlalchemy.exc import SQLAlchemyError
 
 from web.domain.errors import ProductNotFound, StorageNotFound, InvalidProductId
 from web.domain.use_cases.locations_use_cases import search_locations_in_storage
@@ -24,4 +25,6 @@ class SearchCollection(Resource):
             raise errors.ProductNotFoundError
         except StorageNotFound:
             raise errors.StorageNotFoundError
+        except SQLAlchemyError:
+            raise errors.FetchingDataError
         return self.search_location_schema.dump(locations), 200

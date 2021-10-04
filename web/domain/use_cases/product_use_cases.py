@@ -3,7 +3,7 @@ import logging
 from sqlalchemy.exc import SQLAlchemyError
 
 from web.domain.errors import ProductNotFound, LocationIsFull, CanNotAcceptAnotherProduct, ProductIsNotInLocation, \
-    CanNotRemoveThatQuantity, InvalidArea, StorageNotFound, InvalidLocationString, ErrorFetchingData
+    CanNotRemoveThatQuantity, InvalidArea, StorageNotFound, InvalidLocationString, ErrorFetchingData, ErrorInsertingData
 from web.domain.models.location import Location
 from web.domain.models.product import Product
 from web.domain.models.relationships import StoredProducts
@@ -43,9 +43,12 @@ def add_product(product_data):
                                                   quantity=input_quantity)
     except SQLAlchemyError:
         raise ErrorInsertingData
-    # as the API is not using real Meli's IDs, I left this check commented for future refactors
-    # if not meli_repository.check_logistic_type():
-    #     raise ProductWasNotAdded
+
+    # As the API is not using real Meli's IDs, I left this check commented for future refactors
+    """
+    if not meli_repository.check_logistic_type():
+        raise ProductWasNotAdded
+    """
 
     logger.debug(f'Stored product id: {stored_product_id}')
 

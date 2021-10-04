@@ -77,3 +77,10 @@ class InsertingDataError(Error):
     message = 'Something went wrong trying to insert the current product'
     status_code = 500
     error_code = 'INSERTING-ERROR'
+
+
+class FetchingDataError(Error):
+    title = 'Something went wrong fetching data'
+    message = 'Something went wrong trying to fetch the current location'
+    status_code = 500
+    error_code = 'FETCHING-ERROR'
