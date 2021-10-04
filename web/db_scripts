@@ -1,0 +1,6 @@
+-- Se utilizó la BD relacional Postgresql
+
+CREATE ROLE meli_admin with LOGIN ENCRYPTED PASSWORD '1234';
+CREATE DATABASE meli_storage WITH OWNER = meli_admin;
+
+-- las tablas serán creadas por el ORM utilizado al iniciar la BD
