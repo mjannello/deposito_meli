@@ -1,5 +1,7 @@
 import logging
 
+from sqlalchemy.exc import SQLAlchemyError
+
 from web.domain.errors import StorageNotFound, ProductNotFound, InvalidProductId
 from web.domain.models.product import Product
 from web.domain.models.relationships import StoredProducts
@@ -19,8 +21,10 @@ def search_locations_in_storage(storage_name, product_id):
         raise e
     if not product:
         raise ProductNotFound
-
-    stored_products = StoredProducts.get_locations_in_storage(storage, product)
+    try:
+        stored_products = StoredProducts.get_locations_in_storage(storage, product)
+    except SQLAlchemyError:
+        raise
     locations = []
     for sp in stored_products:
         locations.append({
