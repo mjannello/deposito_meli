@@ -33,27 +33,28 @@ def mocked_product_remove_data():
 class TestAddProduct:
 
     def test_add_product_product_not_found(self, mocker):
-        mocker.patch('web.domain.use_cases.initialize_insertion_deletion_models', side_effect=ProductNotFound)
+        mocker.patch('web.domain.use_cases.product_use_cases.initialize_insertion_deletion_models',
+                     side_effect=ProductNotFound)
         with pytest.raises(ProductNotFound):
             add_product(mocked_product_insert_data)
 
     def test_add_product_cannot_insert_max_type_of_products_reached(self, mocker):
         class MockProduct:
             type = 'fake_type'
-        mocker.patch('web.domain.use_cases.initialize_insertion_deletion_models',
+        mocker.patch('web.domain.use_cases.product_use_cases.initialize_insertion_deletion_models',
                      return_value=[1, 'some_stg', MockProduct, 10])
-        mocker.patch('web.domain.use_cases.get_type_products_and_quantity_stored', return_value=['fake_type', 1])
-        mocker.patch('web.domain.use_cases.can_insert_product', side_effect=CanNotAcceptAnotherProduct)
+        mocker.patch('web.domain.use_cases.product_use_cases.get_type_products_and_quantity_stored', return_value=['fake_type', 1])
+        mocker.patch('web.domain.use_cases.product_use_cases.can_insert_product', side_effect=CanNotAcceptAnotherProduct)
         with pytest.raises(CanNotAcceptAnotherProduct):
             add_product(mocked_product_insert_data)
 
     def test_add_product_cannot_insert_location_is_full(self, mocker):
         class MockProduct:
             type = 'fake_type'
-        mocker.patch('web.domain.use_cases.initialize_insertion_deletion_models',
+        mocker.patch('web.domain.use_cases.product_use_cases.initialize_insertion_deletion_models',
                      return_value=[1, 'some_stg', MockProduct, 10])
-        mocker.patch('web.domain.use_cases.get_type_products_and_quantity_stored', return_value=['fake_type', 1])
-        mocker.patch('web.domain.use_cases.can_insert_product', side_effect=LocationIsFull)
+        mocker.patch('web.domain.use_cases.product_use_cases.get_type_products_and_quantity_stored', return_value=['fake_type', 1])
+        mocker.patch('web.domain.use_cases.product_use_cases.can_insert_product', side_effect=LocationIsFull)
         with pytest.raises(LocationIsFull):
             add_product(mocked_product_insert_data)
 
@@ -84,6 +85,6 @@ class TestAddProduct:
 
 class TestRemoveProduct:
     def test_remove_product(self, mocker):
-        mocker.patch('web.domain.use_cases.initialize_insertion_deletion_models', side_effect=ProductNotFound)
+        mocker.patch('web.domain.use_cases.product_use_cases.initialize_insertion_deletion_models', side_effect=ProductNotFound)
         with pytest.raises(ProductNotFound):
             remove_product(mocked_product_remove_data)
