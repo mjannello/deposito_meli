@@ -56,15 +56,15 @@ Documento Swagger:  `http://127.0.0.1:5000/`
 ```
 .
 |──────web/
-| |────__init__.py
-| |────domain/
 | | |────__init__.py
-| | |────models/
-| | |────use_cases/
-| | |────tests/
-| |────infrastructure/
-| | |────__init__.py
-| | |────views/
+| | |────domain/
+| | | |────__init__.py
+| | | |────models/
+| | | |────use_cases/
+| | | |────tests/
+| | |────infrastructure/
+| | | |────__init__.py
+| | | |────views/
 
 ```
 
