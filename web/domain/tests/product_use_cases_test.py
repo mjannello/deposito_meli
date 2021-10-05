@@ -6,17 +6,12 @@ from web.domain.use_cases.product_use_cases import add_product, initialize_inser
 
 
 @pytest.fixture
-def meli_repository(mocker):
-    return mocker.Mock()
-
-
-@pytest.fixture
 def mocked_product_insert_data():
     return {
         "product": 1,
         "storage": "AR01",
         "location": "AL-02-00-IZ",
-        "quantity": 15
+        "quantity": 1
     }
 
 
@@ -26,7 +21,7 @@ def mocked_product_remove_data():
         "product": 1,
         "storage": "AR01",
         "location": "AL-02-00-IZ",
-        "quantity": 5
+        "quantity": 1
     }
 
 
@@ -62,7 +57,7 @@ class TestAddProduct:
         mocker.patch('web.domain.models.product.Product.find_by_id', return_value='product')
         mocker.patch('web.domain.models.location.Location.parse', return_value='location')
         mocker.patch('web.domain.models.storage.Storage.get_storage', return_value='stg')
-        assert initialize_insertion_deletion_models(mocked_product_insert_data) == (15, 'location', 'product', 'stg')
+        assert initialize_insertion_deletion_models(mocked_product_insert_data) == (1, 'location', 'product', 'stg')
 
     def test_initialize_insertion_deletion_models_product_is_none(self, mocker, mocked_product_insert_data):
         mocker.patch('web.domain.models.product.Product.find_by_id', return_value=None)
@@ -71,12 +66,9 @@ class TestAddProduct:
         with pytest.raises(ProductNotFound):
             initialize_insertion_deletion_models(mocked_product_insert_data)
 
-    def test_can_insert_product_cannot_accept_another_product(self, monkeypatch):
-        with monkeypatch.context() as m:
-            m.setenv('MAX_TYPES_IN_LOCATION', 3)
-            m.setenv('MAX_PRODUCTS_IN_LOCATION', 100)
-            with pytest.raises(CanNotAcceptAnotherProduct):
-                can_insert_product(['type1', 'type2', 'type3'], 10, 'type 4', 30)
+    def test_can_insert_product_cannot_accept_another_product(self):
+        with pytest.raises(CanNotAcceptAnotherProduct):
+            can_insert_product(['type1', 'type2', 'type3'], 10, 'type 4', 30)
 
     def test_can_insert_product_location_is_full(self):
         with pytest.raises(LocationIsFull):
